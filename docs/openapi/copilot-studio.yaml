@@ -1,10 +1,11 @@
 openapi: 3.0.3
 info:
   title: AzureBot Copilot Studio Connector
-  version: 1.0.0
+  version: 2.0.0
   description: >-
-    Narrow HTTP contract for a Microsoft Copilot Studio custom connector to
-    call AzureBot's grounded RAG assistant.
+    Microsoft Copilot Studio custom connector for AzureBot grounded RAG and
+    Microsoft Graph actions. Configure OAuth against the AzureBot API Entra
+    application before importing into a tenant.
 servers:
   - url: https://YOUR-AZUREBOT-HOST
 paths:
@@ -12,8 +13,7 @@ paths:
     post:
       operationId: askAzureBot
       summary: Ask AzureBot a grounded question
-      security:
-        - oauth2: []
+      security: [{oauth2: []}]
       requestBody:
         required: true
         content:
@@ -22,17 +22,74 @@ paths:
               $ref: '#/components/schemas/AskRequest'
       responses:
         '200':
-          description: Grounded answer with citations
+          description: AzureBot answer with its normal RAG response payload
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AskResponse'
-        '401':
-          description: Authentication required
-        '403':
-          description: Authorization denied
-        '422':
-          description: Invalid request
+                type: object
+                additionalProperties: true
+        '400': {description: Invalid request}
+        '401': {description: Authentication required}
+        '403': {description: Authorization denied}
+  /api/copilot/me:
+    get:
+      operationId: getMyProfile
+      summary: Get the signed-in Microsoft 365 profile
+      security: [{oauth2: []}]
+      responses:
+        '200':
+          description: Microsoft Graph user profile
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}
+        '401': {description: Authentication required}
+        '403': {description: Graph permission denied}
+  /api/copilot/sharepoint/search:
+    get:
+      operationId: searchSharePoint
+      summary: Search authorized Microsoft 365 and SharePoint content
+      security: [{oauth2: []}]
+      parameters:
+        - {name: q, in: query, required: true, schema: {type: string, maxLength: 300}}
+        - {name: limit, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 10, default: 5}}
+      responses:
+        '200':
+          description: Microsoft Graph search response
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}
+        '401': {description: Authentication required}
+        '403': {description: Graph permission denied}
+  /api/copilot/mail/messages:
+    get:
+      operationId: getRecentMail
+      summary: Get recent mail messages for the signed-in user
+      security: [{oauth2: []}]
+      parameters:
+        - {name: limit, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 10, default: 5}}
+      responses:
+        '200':
+          description: Recent mail messages
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}
+        '401': {description: Authentication required}
+        '403': {description: Graph permission denied}
+  /api/copilot/calendar/events:
+    get:
+      operationId: getUpcomingCalendarEvents
+      summary: Get upcoming calendar events for the signed-in user
+      security: [{oauth2: []}]
+      parameters:
+        - {name: limit, in: query, required: false, schema: {type: integer, minimum: 1, maximum: 10, default: 5}}
+      responses:
+        '200':
+          description: Upcoming calendar events
+          content:
+            application/json:
+              schema: {type: object, additionalProperties: true}
+        '401': {description: Authentication required}
+        '403': {description: Graph permission denied}
 components:
   securitySchemes:
     oauth2:
@@ -41,48 +98,12 @@ components:
         authorizationCode:
           authorizationUrl: https://login.microsoftonline.com/YOUR-TENANT-ID/oauth2/v2.0/authorize
           tokenUrl: https://login.microsoftonline.com/YOUR-TENANT-ID/oauth2/v2.0/token
-          scopes: {}
+          scopes:
+            api://YOUR-API-CLIENT-ID/access_as_user: Access AzureBot as the signed-in user
   schemas:
     AskRequest:
       type: object
-      required:
-        - question
+      required: [question]
       properties:
-        question:
-          type: string
-          minLength: 1
-        conversationId:
-          type: string
-        topK:
-          type: integer
-          minimum: 1
-          maximum: 20
-          default: 5
-    Citation:
-      type: object
-      required:
-        - title
-      properties:
-        title:
-          type: string
-        url:
-          type: string
-        excerpt:
-          type: string
-    AskResponse:
-      type: object
-      required:
-        - answer
-        - grounded
-        - citations
-      properties:
-        answer:
-          type: string
-        grounded:
-          type: boolean
-        citations:
-          type: array
-          items:
-            $ref: '#/components/schemas/Citation'
-        reason:
-          type: string
+        question: {type: string, minLength: 1, maxLength: 4000}
+        conversationId: {type: string}
