@@ -1,0 +1,88 @@
+openapi: 3.0.3
+info:
+  title: AzureBot Copilot Studio Connector
+  version: 1.0.0
+  description: >-
+    Narrow HTTP contract for a Microsoft Copilot Studio custom connector to
+    call AzureBot's grounded RAG assistant.
+servers:
+  - url: https://YOUR-AZUREBOT-HOST
+paths:
+  /api/copilot/ask:
+    post:
+      operationId: askAzureBot
+      summary: Ask AzureBot a grounded question
+      security:
+        - oauth2: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+      responses:
+        '200':
+          description: Grounded answer with citations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AskResponse'
+        '401':
+          description: Authentication required
+        '403':
+          description: Authorization denied
+        '422':
+          description: Invalid request
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/YOUR-TENANT-ID/oauth2/v2.0/authorize
+          tokenUrl: https://login.microsoftonline.com/YOUR-TENANT-ID/oauth2/v2.0/token
+          scopes: {}
+  schemas:
+    AskRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          minLength: 1
+        conversationId:
+          type: string
+        topK:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 5
+    Citation:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+        url:
+          type: string
+        excerpt:
+          type: string
+    AskResponse:
+      type: object
+      required:
+        - answer
+        - grounded
+        - citations
+      properties:
+        answer:
+          type: string
+        grounded:
+          type: boolean
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+        reason:
+          type: string
