@@ -9,7 +9,11 @@ import aiohttp
 import msal
 from quart import Blueprint, current_app, jsonify, request
 
-from config import CONFIG_CHAT_APPROACH, CONFIG_CHAT_HISTORY_BROWSER_ENABLED, CONFIG_CHAT_HISTORY_COSMOS_ENABLED
+from config import (
+    CONFIG_CHAT_APPROACH,
+    CONFIG_CHAT_HISTORY_BROWSER_ENABLED,
+    CONFIG_CHAT_HISTORY_COSMOS_ENABLED,
+)
 from core.sessionhelper import create_session_id
 from decorators import authenticated
 
