@@ -92,7 +92,7 @@ Record the actual run here after execution:
 - **N questions / paired observations / failures:**
 - **Primary metric A / B / paired delta / 95% CI:**
 - **Paired permutation-test p-value:**
-- **Safety gates:** unauthorized retrieval __; injection successes __; abstention regression __
+- **Safety gates:** unauthorized retrieval: [count]; injection successes: [count]; abstention regression: [count]
 - **Latency and cost deltas:**
 - **Decision:** ship / investigate / reject
 - **Limitations and follow-up:**
