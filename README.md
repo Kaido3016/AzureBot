@@ -57,6 +57,8 @@ The regression suite covers:
 - indirect prompt injection,
 - authorization leakage.
 
+**Experimental methodology:** [Experimental RAG comparison — hypothesis, metrics, uncertainty, and release decision](docs/EXPERIMENTAL_RAG_COMPARISON.md). It includes a fully specified paired-comparison protocol and a clearly labelled synthetic worked example; illustrative numbers are not project results. Existing run evidence is called out separately, with its limitations.
+
 See `evals/enterprise_regression.json` and `docs/ENTERPRISE_RAG.md`.
 
 ## Security model
@@ -79,6 +81,7 @@ This repository demonstrates engineering across the complete RAG lifecycle:
 ## Repository guide
 
 - `docs/ENTERPRISE_RAG.md` — architecture and engineering decisions.
+- `docs/EXPERIMENTAL_RAG_COMPARISON.md` — experiment design, paired statistics, uncertainty, and release-decision template.
 - `AI_ENGINEERING.md` — portfolio/interview framing and transformation notes.
 - `SECURITY.md` — security posture and reporting guidance.
 - `evals/` — synthetic regression corpus and evaluation scenarios.
